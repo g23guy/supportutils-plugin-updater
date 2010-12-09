@@ -22,6 +22,7 @@ BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 BuildArch:    noarch
 Distribution: Novell NTS
 Vendor:       Novell Technical Services
+Requires:     wget
 
 %description
 Automatically downloads and updates the supportutils and supporting
