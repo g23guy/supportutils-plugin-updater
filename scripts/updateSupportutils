@@ -8,7 +8,7 @@
 #              Jason Record (jrecord@novell.com)
 # Modified:    2010 Dec 09
 #############################################################
-SVER="0.6.0"
+SVER="0.6.2"
 
 title() {
 	echo "################################################################"
@@ -18,9 +18,11 @@ title() {
 }
 
 show_help() {
-	echo "Usage $BASENAME [OPTIONS]"
+	echo "Usage: $BASENAME [OPTION]"
 	echo
 	echo "Description"
+	echo " Makes sure the supportutils and supportutils plugin packages are"
+	echo " current."
 	echo
 	echo "Options"
 	echo " -m Install a cron for monthly updates"
@@ -34,7 +36,10 @@ show_help() {
 
 runAsRoot() {
 	if [ "$UID" -ne "0" ]; then
-		echo "Login as root, $USER ($UID) not allowed."
+		echo "ERROR: Permisison denied for $USER ($UID)"
+		echo "Run as root"
+		echo
+		show_help
 		echo
 		exit 1
 	fi
