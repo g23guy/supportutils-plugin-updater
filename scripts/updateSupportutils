@@ -1,0 +1,272 @@
+#!/bin/bash
+#############################################################
+# Name:        Supportutils Auto Update Client
+# Description: Automatically updates the suppportutils package
+#              and all supporting supportutils plugins.
+# License:     GPLv2
+# Authors/Contributors:
+#              Jason Record (jrecord@novell.com)
+# Modified:    2010 Dec 09
+#############################################################
+SVER="0.6.0"
+
+title() {
+	echo "################################################################"
+	echo "# Supportutils Auto Updater v${SVER}"
+	echo "################################################################"
+	echo
+}
+
+show_help() {
+	echo "Usage $BASENAME [OPTIONS]"
+	echo
+	echo "Description"
+	echo
+	echo "Options"
+	echo " -m Install a cron for monthly updates"
+	echo " -w Install a cron for weekly updates"
+	echo " -d Delete installed cron entries"
+	echo " -l List cron entries"
+	echo " -v Verbose mode"
+	echo " -h This screen"
+	echo
+}
+
+runAsRoot() {
+	if [ "$UID" -ne "0" ]; then
+		echo "Login as root, $USER ($UID) not allowed."
+		echo
+		exit 1
+	fi
+}
+
+removeOldPackages() {
+	[ $DEBUG -gt 0 ] && { echo; echo ">>removeOldPackages() Removing older supportconfig packages"; }
+	rpm -e ntsutils &>/dev/null
+}
+
+getUpdatedRpms() {
+	printf $PFORMAT "Connecting to Update Server ... "
+	UPDATED_LIST=${FILEDIR}/list.html
+	if wget -q --output-document $UPDATED_LIST $SRCURL &>/dev/null; then
+		UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+		echo Done
+	else
+		echo ERROR
+		echo "Cannot connect to update server"
+		echo
+		exit 2
+	fi
+}
+
+compareVersions() {
+	RC=0
+	IVER=$1
+	UVER=$2
+	[ $DEBUG -gt 0 ] && echo " >>compareVersions() Comparing '$IVER' to '$UVER'"
+	IARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
+	UARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
+	if [ ${#IARRAY[@]} -lt ${#UARRAY[@]} ]; then # Use the smaller of the two arrays
+		LOOPARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
+	else
+		LOOPARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
+	fi
+	for (( I=0 ; I < ${#LOOPARRAY[@]} ; I++ ))
+	do
+		[ $DEBUG -gt 0 ] && echo " >>compareVersions() '${UARRAY[$I]}' gt? '${IARRAY[$I]}'"
+		if echo ${IARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
+			if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
+				RC=1
+				break
+			fi
+		elif echo ${UARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
+			if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
+				RC=1
+				break
+			fi
+		elif [ ${UARRAY[$I]} -gt ${IARRAY[$I]} ]; then
+			RC=1
+			break
+		fi
+	done
+	return $RC
+}
+
+pluginRequired() {
+	RPM=$1
+	[ $DEBUG -gt 0 ] && echo " >>pluginRequired() Determining if $RPM is needed"
+	if [ "$RPM" = "supportutils" ]; then
+		return 0
+	elif [ "$RPM" = "supportutils-plugin-updater" ]; then
+		return 0
+	elif [ "$RPM" = "supportutils-plugin-groupwise" ]; then
+		if rpm -qa | grep -i groupwise &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-iprint" ]; then
+		if rpm -q novell-iprint-server &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-nowsbe" ]; then
+		if rpm -q NOWS-copyMedia &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-slepos" ]; then
+		if rpm -q slepos-release &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-susestudio" ]; then
+		if rpm -q susestudio &>/dev/null; then return 0; else return 1; fi
+	else
+		return 0 # New unknown plugins are automatically added since we currently don't know if they are required
+	fi
+}
+
+downLoad() {
+	PACKAGE=$1
+	[ $DEBUG -gt 0 ] && echo " >>downLoad() Downloading $PACKAGE"
+	cd $FILEDIR
+	[ $DEBUG -gt 0 ] && { wget ${SRCURL}/$PACKAGE; echo; } || wget -q ${SRCURL}/$PACKAGE &>/dev/null
+	return 0
+}
+
+upDate() {
+	PACKAGE=$1
+	[ $DEBUG -gt 0 ] && echo " >>upDate() Updating to $PACKAGE"
+	[ $DEBUG -gt 0 ] && rpm -Uvh --force ${FILEDIR}/$PACKAGE || rpm -U --force ${FILEDIR}/$PACKAGE &>/dev/null
+	return 0
+}
+
+updateSupportutils() {
+	for PACKAGE in $UPDATED_RPMS
+	do
+		if echo $PACKAGE | grep plugin &>/dev/null; then
+			RPM=$(echo $PACKAGE | sed -e 's/\(supportutils-plugin-[[:alpha:]]*\)-.*rpm/\1/g')
+		else
+			RPM='supportutils'
+		fi
+		UPDATED_VER=$(echo $PACKAGE | sed -e "s/$RPM-//g;s/\.noarch\.rpm//g")
+		[ $DEBUG -gt 0 ] && 	{ echo; echo "################################################################"; }
+		printf $PFORMAT "Evaluating $RPM ... "
+		INSTALLED_VER=$(rpm -q --queryformat "%{VERSION}-%{RELEASE}" $RPM)
+		if echo $INSTALLED_VER | grep -i package &>/dev/null; then
+			if pluginRequired $RPM; then
+				echo Installing
+				downLoad $PACKAGE
+				upDate $PACKAGE
+			else
+				echo Unused
+			fi
+		else
+			compareVersions $INSTALLED_VER $UPDATED_VER 
+			RESULT=$?
+			if [ $RESULT -gt 0 ]; then
+				echo Updating
+				downLoad $PACKAGE
+				upDate $PACKAGE
+			else
+				echo Unchanged
+			fi
+		fi
+	done
+}
+
+cronInstallMonthly() {
+	printf $PFORMAT "Installing Monthly Update Cron ... "
+	if [ -d /etc/cron.monthly ]; then
+		cd /etc/cron.monthly
+		ln -sf /sbin/updateSupportutils
+		echo Done
+		echo
+		exit 0
+	else
+		echo Error
+		echo
+		exit 3
+	fi
+}
+
+cronInstallWeekly() {
+	printf $PFORMAT "Installing Weekly Update Cron ... "
+	if [ -d /etc/cron.weekly ]; then
+		cd /etc/cron.weekly
+		ln -sf /sbin/updateSupportutils
+		echo Done
+		echo
+		exit 0
+	else
+		echo Error
+		echo
+		exit 3
+	fi
+}
+
+cronDeleteAll() {
+	printf $PFORMAT "Deleting Update Crons ... "
+	for i in weekly monthly
+	do
+		rm -f /etc/cron.${i}/$BASENAME
+	done
+	echo Done
+	echo
+	exit 0
+}
+
+cronList() {
+	echo "Installed Cron Entries"
+	COUNT=0
+	for i in weekly monthly
+	do
+		FILE="/etc/cron.${i}/$BASENAME"
+		if [ -e $FILE ]; then
+			ls -l $FILE
+			((COUNT++))
+		fi
+	done
+	if ! (( COUNT )); then
+		echo None
+	fi
+	echo
+	exit 0
+}
+
+cleanUp() {
+	rm -rf $FILEDIR
+}
+
+#############################################################
+# GLOBAL VARIABLES
+#############################################################
+SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_10/noarch/'
+BASENAME=$(basename $0)
+FILEDIR=$(mktemp -d /tmp/${BASENAME}-XXXXXXXXXXXXXXX)
+UPDATED_RPMS=''
+DEBUG=0 # 0 off, 1 on
+
+#############################################################
+# MAIN
+#############################################################
+clear
+title
+while getopts :hvmwdl TMPOPT
+do
+	case $TMPOPT in
+	\:)	case $OPTARG in
+			*) echo "ERROR: Missing Argument -$OPTARG"
+				;;
+			esac
+			echo; show_help; exit 1 ;;
+	\?)	case $OPTARG in
+			*) echo "ERROR: Invalid Option -$OPTARG"
+				;;
+			esac
+			echo; show_help; exit 2 ;;
+	h) show_help; exit 0 ;;
+	v) DEBUG=1 ;;
+	m) cronInstallMonthly ;;
+	w) cronInstallWeekly ;;
+	d) cronDeleteAll ;;
+	l) cronList ;;
+	esac
+done
+[ $DEBUG -gt 0 ] && PFORMAT="\n%-55s\n" || PFORMAT="%-55s"
+
+runAsRoot
+getUpdatedRpms
+removeOldPackages
+updateSupportutils
+cleanUp
+echo
+
