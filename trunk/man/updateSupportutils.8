@@ -1,9 +1,30 @@
 .TH updateSupportutils "8" "09 Dec 2010" "updateSupportutils" "Support Utilities Manual"
 .SH NAME
 updateSupportutils \- Supportutils Auto Update Client
+.SH SYNOPSIS
+updateSupportutils [OPTION]
 .SH DESCRIPTION
 Automatically updates the supportutils and applicable supportutils plugin packages. It can 
 be configured for a weekly or monthly cron to keep supportutils current.
+.SH OPTIONS
+.TP
+\fB\-h\fR
+The help screen
+.TP
+\fB\-m\fR
+Install a cron for monthly updates
+.TP
+\fB\-w\fR
+Install a cron for weekly updates
+.TP
+\fB\-d\fR
+Delete installed cron entries
+.TP
+\fB\-l\fR
+List cron entries
+.TP
+\fB\-v\fR
+Verbose mode
 
 .SH FILES
 .I /sbin/updateSupportutils
