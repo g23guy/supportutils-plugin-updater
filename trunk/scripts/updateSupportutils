@@ -8,7 +8,7 @@
 #              Jason Record (jrecord@novell.com)
 # Modified:    2010 Dec 09
 #############################################################
-SVER="0.6.2"
+SVER="0.6.5"
 
 title() {
 	echo "################################################################"
@@ -29,6 +29,7 @@ show_help() {
 	echo " -w Install a cron for weekly updates"
 	echo " -d Delete installed cron entries"
 	echo " -l List cron entries"
+	echo " -u Force RPM update on applicable packages"
 	echo " -v Verbose mode"
 	echo " -h This screen"
 	echo
@@ -71,29 +72,35 @@ compareVersions() {
 	[ $DEBUG -gt 0 ] && echo " >>compareVersions() Comparing '$IVER' to '$UVER'"
 	IARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
 	UARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
-	if [ ${#IARRAY[@]} -lt ${#UARRAY[@]} ]; then # Use the smaller of the two arrays
-		LOOPARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
+	if [ ${#UARRAY[@]} -gt ${#IARRAY[@]} ]; then # The updated version is longer than the installed version, assume update is needed
+		RC=1
+	elif [ $UPDATE -gt 0 ]; then
+		RC=1
 	else
-		LOOPARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
-	fi
-	for (( I=0 ; I < ${#LOOPARRAY[@]} ; I++ ))
-	do
-		[ $DEBUG -gt 0 ] && echo " >>compareVersions() '${UARRAY[$I]}' gt? '${IARRAY[$I]}'"
-		if echo ${IARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
-			if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
-				RC=1
-				break
-			fi
-		elif echo ${UARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
-			if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
-				RC=1
-				break
-			fi
-		elif [ ${UARRAY[$I]} -gt ${IARRAY[$I]} ]; then
-			RC=1
-			break
+		if [ ${#IARRAY[@]} -lt ${#UARRAY[@]} ]; then # Use the smaller of the two arrays
+			LOOPARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
+		else
+			LOOPARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
 		fi
-	done
+		for (( I=0 ; I < ${#LOOPARRAY[@]} ; I++ ))
+		do
+			[ $DEBUG -gt 0 ] && echo " >>compareVersions() '${UARRAY[$I]}' gt? '${IARRAY[$I]}'"
+			if echo ${IARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
+				if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
+					RC=1
+					break
+				fi
+			elif echo ${UARRAY[$I]} | grep '[[:alpha:]]' &>/dev/null; then
+				if [ "${UARRACY[$I]}" != "${IARRAY[$I]}" ]; then
+					RC=1
+					break
+				fi
+			elif [ ${UARRAY[$I]} -gt ${IARRAY[$I]} ]; then
+				RC=1
+				break
+			fi
+		done
+	fi
 	return $RC
 }
 
@@ -239,13 +246,14 @@ BASENAME=$(basename $0)
 FILEDIR=$(mktemp -d /tmp/${BASENAME}-XXXXXXXXXXXXXXX)
 UPDATED_RPMS=''
 DEBUG=0 # 0 off, 1 on
+UPDATE=0
 
 #############################################################
 # MAIN
 #############################################################
 clear
 title
-while getopts :hvmwdl TMPOPT
+while getopts :hvmwdlu TMPOPT
 do
 	case $TMPOPT in
 	\:)	case $OPTARG in
@@ -263,6 +271,7 @@ do
 	m) cronInstallMonthly ;;
 	w) cronInstallWeekly ;;
 	d) cronDeleteAll ;;
+	u) UPDATE=1 ;;
 	l) cronList ;;
 	esac
 done
