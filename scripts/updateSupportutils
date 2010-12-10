@@ -8,11 +8,11 @@
 #              Jason Record (jrecord@novell.com)
 # Modified:    2010 Dec 09
 #############################################################
-SVER="0.6.5"
+SVER="0.7.0"
 
 title() {
 	echo "################################################################"
-	echo "# Supportutils Auto Updater v${SVER}"
+	echo "# Supportutils Auto Update Client v${SVER}"
 	echo "################################################################"
 	echo
 }
