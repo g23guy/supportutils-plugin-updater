@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Fri Dec 10 05:58:10 MST 2010 - jrecord@novell.com
+Fri 10 Dec 2010 10:31:25 AM MST - jrecord@novell.com
 
+-added -p to exclude plugins
 -interface enhancements
 
 -------------------------------------------------------------------

@@ -8,7 +8,7 @@
 #              Jason Record (jrecord@novell.com)
 # Modified:    2010 Dec 10
 #############################################################
-SVER="0.7.5"
+SVER="0.8.0"
 
 title() {
 	echo "################################################################"
@@ -30,6 +30,7 @@ show_help() {
 	echo " -d Delete installed cron entries"
 	echo " -l List cron entries"
 	echo " -u Force RPM update on applicable packages"
+	echo " -p Exclude supportutils plugin packages"
 	echo " -v Verbose mode"
 	echo " -h This screen"
 	echo
@@ -55,7 +56,11 @@ getUpdatedRpms() {
 	printf $PFORMAT "Connecting to Update Server ... "
 	UPDATED_LIST=${FILEDIR}/list.html
 	if wget -q --output-document $UPDATED_LIST $SRCURL &>/dev/null; then
-		UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+		if (( $NO_PLUGINS )); then
+			UPDATED_RPMS=$(egrep "href.*supportutils-[[:digit:]].*rpm|href.*supportutils-plugin-updater.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+		else
+			UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+		fi
 		echo Done
 	else
 		echo ERROR
@@ -72,9 +77,9 @@ compareVersions() {
 	[ $DEBUG -gt 0 ] && echo " >>compareVersions() Comparing '$IVER' to '$UVER'"
 	IARRAY=($(echo $IVER | sed -e 's/-/\./g;s/\./ /g'))
 	UARRAY=($(echo $UVER | sed -e 's/-/\./g;s/\./ /g'))
-	if [ ${#UARRAY[@]} -gt ${#IARRAY[@]} ]; then # The updated version is longer than the installed version, assume update is needed
+	if [ $UPDATE -gt 0 ]; then # -u was invoked
 		RC=1
-	elif [ $UPDATE -gt 0 ]; then
+	elif [ ${#UARRAY[@]} -gt ${#IARRAY[@]} ]; then # The updated version is longer than the installed version, assume update is needed
 		RC=1
 	else
 		if [ ${#IARRAY[@]} -lt ${#UARRAY[@]} ]; then # Use the smaller of the two arrays
@@ -247,13 +252,14 @@ FILEDIR=$(mktemp -d /tmp/${BASENAME}-XXXXXXXXXXXXXXX)
 UPDATED_RPMS=''
 DEBUG=0 # 0 off, 1 on
 UPDATE=0
+NO_PLUGINS=0
 
 #############################################################
 # MAIN
 #############################################################
 clear
 title
-while getopts :hvmwdlu TMPOPT
+while getopts :hvmwdlup TMPOPT
 do
 	case $TMPOPT in
 	\:)	case $OPTARG in
@@ -271,6 +277,7 @@ do
 	m) cronInstallMonthly ;;
 	w) cronInstallWeekly ;;
 	d) cronDeleteAll ;;
+	p) NO_PLUGINS=1 ;;
 	u) UPDATE=1 ;;
 	l) cronList ;;
 	esac
