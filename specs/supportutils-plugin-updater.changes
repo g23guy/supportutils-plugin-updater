@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Dec 09 17:19:56 MST 2010 - jrecord@novell.com
+
+-fixed longer update RPM version needing updates
+-added -u to force RPM updates
+
+-------------------------------------------------------------------
 Wed Dec 09 14:55:53 MST 2010 - jrecord@novell.com
 
 -initial build
