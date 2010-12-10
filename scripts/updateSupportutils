@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@novell.com)
-# Modified:    2010 Dec 09
+# Modified:    2010 Dec 10
 #############################################################
-SVER="0.7.0"
+SVER="0.7.5"
 
 title() {
 	echo "################################################################"
@@ -107,9 +107,9 @@ compareVersions() {
 pluginRequired() {
 	RPM=$1
 	[ $DEBUG -gt 0 ] && echo " >>pluginRequired() Determining if $RPM is needed"
-	if [ "$RPM" = "supportutils" ]; then
+	if [ "$RPM" = "supportutils" ]; then # always required
 		return 0
-	elif [ "$RPM" = "supportutils-plugin-updater" ]; then
+	elif [ "$RPM" = "supportutils-plugin-updater" ]; then # always required
 		return 0
 	elif [ "$RPM" = "supportutils-plugin-groupwise" ]; then
 		if rpm -qa | grep -i groupwise &>/dev/null; then return 0; else return 1; fi
@@ -165,7 +165,7 @@ updateSupportutils() {
 			compareVersions $INSTALLED_VER $UPDATED_VER 
 			RESULT=$?
 			if [ $RESULT -gt 0 ]; then
-				echo Updating
+				echo "Updating to $UPDATED_VER"
 				downLoad $PACKAGE
 				upDate $PACKAGE
 			else
@@ -206,7 +206,7 @@ cronInstallWeekly() {
 }
 
 cronDeleteAll() {
-	printf $PFORMAT "Deleting Update Crons ... "
+	printf $PFORMAT "Deleting Update Cron Entries ... "
 	for i in weekly monthly
 	do
 		rm -f /etc/cron.${i}/$BASENAME
