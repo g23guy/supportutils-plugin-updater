@@ -22,6 +22,7 @@ BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 BuildArch:    noarch
 Distribution: Novell NTS
 Vendor:       Novell Technical Services
+Requires:     bash
 Requires:     wget
 
 %description
@@ -45,7 +46,7 @@ pwd;ls -la
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/sbin
 install -d $RPM_BUILD_ROOT/usr/share/man/man8
-install -m 0500 updateSupportutils $RPM_BUILD_ROOT/sbin/updateSupportutils
+install -m 0544 updateSupportutils $RPM_BUILD_ROOT/sbin/updateSupportutils
 install -m 0644 updateSupportutils.8.gz $RPM_BUILD_ROOT/usr/share/man/man8/updateSupportutils.8.gz
 
 %files
