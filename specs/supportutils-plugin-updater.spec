@@ -24,6 +24,8 @@ Distribution: Novell NTS
 Vendor:       Novell Technical Services
 Requires:     bash
 Requires:     wget
+Requires:     grep
+Requires:     coreutils
 
 %description
 Automatically downloads and updates the supportutils and supporting
