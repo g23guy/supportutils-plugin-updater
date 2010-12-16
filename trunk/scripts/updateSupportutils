@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@novell.com)
-# Modified:    2010 Dec 10
+# Modified:    2010 Dec 16
 #############################################################
-SVER="0.8.0"
+SVER="0.9.0"
 
 title() {
 	echo "################################################################"
@@ -110,24 +110,30 @@ compareVersions() {
 }
 
 pluginRequired() {
-	RPM=$1
+	RPM=$1 # The current available plugin
 	[ $DEBUG -gt 0 ] && echo " >>pluginRequired() Determining if $RPM is needed"
-	if [ "$RPM" = "supportutils" ]; then # always required
-		return 0
-	elif [ "$RPM" = "supportutils-plugin-updater" ]; then # always required
-		return 0
+	if [ "$RPM" = "supportutils" ]; then
+		return 0 # always required
+	elif [ "$RPM" = "supportutils-plugin-updater" ]; then
+		return 0 # always required
+	elif [ "$RPM" = "supportutils-plugin-idm" ]; then
+		if rpm -q novell-idm &>/dev/null; then return 0; else return 1; fi # needs updating when/if available
 	elif [ "$RPM" = "supportutils-plugin-groupwise" ]; then
 		if rpm -qa | grep -i groupwise &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-iprint" ]; then
 		if rpm -q novell-iprint-server &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-nowsbe" ]; then
 		if rpm -q NOWS-copyMedia &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-ncs" ]; then
+		if rpm -q novell-cluster-services &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-sentinel" ]; then
+		if rpm -q novell-sentinel &>/dev/null; then return 0; else return 1; fi # needs updating when/if available
 	elif [ "$RPM" = "supportutils-plugin-slepos" ]; then
 		if rpm -q slepos-release &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-susestudio" ]; then
 		if rpm -q susestudio &>/dev/null; then return 0; else return 1; fi
 	else
-		return 0 # New unknown plugins are automatically added since we currently don't know if they are required
+		return 0 # New plugins are automatically added since we currently don't know if they are required
 	fi
 }
 

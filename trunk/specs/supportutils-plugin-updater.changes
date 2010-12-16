@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Dec 16 15:55:32 MST 2010 - jrecord@novell.com
+
+-added plugin tags for idm,sentinel,ncs
+
+-------------------------------------------------------------------
 Fri Dec 10 10:41:25 MST 2010 - jrecord@novell.com
 
 -added -p to exclude plugins

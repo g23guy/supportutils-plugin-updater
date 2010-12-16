@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      4
+Release:      4.20101216.PTF.1
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
