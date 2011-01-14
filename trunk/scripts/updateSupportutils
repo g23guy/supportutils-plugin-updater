@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@novell.com)
-# Modified:    2010 Dec 21
+# Modified:    2011 Jan 14
 #############################################################
-SVER="0.9.0"
+SVER="1.0.0"
 
 title() {
 	echo "################################################################"
@@ -21,18 +21,18 @@ show_help() {
 	echo "Usage: $BASENAME [OPTION]"
 	echo
 	echo "Description"
-	echo " Makes sure the supportutils and supportutils plugin packages are"
-	echo " current."
+	echo "  Makes sure the supportutils and supportutils plugin packages are"
+	echo "  installed and current."
 	echo
 	echo "Options"
-	echo " -m Install a cron for monthly updates"
-	echo " -w Install a cron for weekly updates"
-	echo " -d Delete installed cron entries"
-	echo " -l List cron entries"
-	echo " -u Force RPM update on applicable packages"
-	echo " -p Exclude supportutils plugin packages"
-	echo " -v Verbose mode"
-	echo " -h This screen"
+	echo " -m  Install a monthly cron for updateSupportutils"
+	echo " -w  Install a weekly cron for updateSupportutils"
+	echo " -d  Delete all installed cron entries for updateSupportutils"
+	echo " -l  List all cron entries for updateSupportutils"
+	echo " -u  Force RPM update on applicable packages"
+	echo " -p  Exclude supportutils plugin packages"
+	echo " -v  Verbose mode"
+	echo " -h  This screen"
 	echo
 }
 

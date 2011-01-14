@@ -1,7 +1,7 @@
 #
-# spec file for package supportutils-plugin-updater (Version 0.0-0)
+# spec file for package supportutils-plugin-updater (Version 1.0-6)
 #
-# Copyright (C) 2010 Novell, Inc.
+# Copyright (C) 2011 Novell, Inc.
 # This file and all modifications and additions to the pristine
 # package are under the same license as the package itself.
 #
@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      5
+Release:      6
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
