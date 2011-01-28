@@ -1,5 +1,5 @@
 #
-# spec file for package supportutils-plugin-updater (Version 1.0-6)
+# spec file for package supportutils-plugin-updater (Version 1.0-13)
 #
 # Copyright (C) 2011 Novell, Inc.
 # This file and all modifications and additions to the pristine
@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      6
+Release:      13
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -50,6 +50,11 @@ install -d $RPM_BUILD_ROOT/sbin
 install -d $RPM_BUILD_ROOT/usr/share/man/man8
 install -m 0544 updateSupportutils $RPM_BUILD_ROOT/sbin/updateSupportutils
 install -m 0644 updateSupportutils.8.gz $RPM_BUILD_ROOT/usr/share/man/man8/updateSupportutils.8.gz
+
+%post
+echo
+echo "Now run updateSupportutils"
+echo
 
 %files
 %defattr(-,root,root)

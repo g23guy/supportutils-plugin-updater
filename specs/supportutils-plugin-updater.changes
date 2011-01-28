@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan 28 09:57:21 MST 2011 - jrecord@novell.com
+
+-added message to run updateSupportutils after install
+
+-------------------------------------------------------------------
 Thu Dec 21 16:04:43 MST 2010 - jrecord@novell.com
 
 -added plugin tags for idm,sentinel,ncs
