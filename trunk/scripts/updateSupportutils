@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@novell.com)
-# Modified:    2011 Jan 14
+# Modified:    2011 Jun 30
 #############################################################
-SVER="1.0.0"
+SVER="1.0.1"
 
 title() {
 	echo "################################################################"
@@ -139,10 +139,19 @@ pluginRequired() {
 
 downLoad() {
 	PACKAGE=$1
+	RETRIES="--tries=5 --waitretry=5"
+	RCODE=0
 	[ $DEBUG -gt 0 ] && echo " >>downLoad() Downloading $PACKAGE"
 	cd $FILEDIR
-	[ $DEBUG -gt 0 ] && { wget ${SRCURL}/$PACKAGE; echo; } || wget -q ${SRCURL}/$PACKAGE &>/dev/null
-	return 0
+	if [ $DEBUG -gt 0 ]; then
+		wget -Sv $RETRIES ${SRCURL}/$PACKAGE
+		RCODE=$?
+		echo
+	else
+		wget -q $RETRIES ${SRCURL}/$PACKAGE &>/dev/null
+		RCODE=$?
+	fi
+	return $RCODE
 }
 
 upDate() {
@@ -167,8 +176,11 @@ updateSupportutils() {
 		if echo $INSTALLED_VER | grep -i package &>/dev/null; then
 			if pluginRequired $RPM; then
 				echo Installing
-				downLoad $PACKAGE
-				upDate $PACKAGE
+				if downLoad $PACKAGE; then
+					upDate $PACKAGE
+				else
+					echo " - Retry Later"
+				fi
 			else
 				echo Unused
 			fi
@@ -177,8 +189,11 @@ updateSupportutils() {
 			RESULT=$?
 			if [ $RESULT -gt 0 ]; then
 				echo "Updating to $UPDATED_VER"
-				downLoad $PACKAGE
-				upDate $PACKAGE
+				if downLoad $PACKAGE; then
+					upDate $PACKAGE
+				else
+					echo " - Retry Later"
+				fi
 			else
 				echo Unchanged
 			fi
