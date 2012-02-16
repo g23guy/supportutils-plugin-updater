@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@novell.com)
-# Modified:    2011 Jun 30
+# Modified:    2012 Feb 16
 #############################################################
-SVER="1.0.1"
+SVER="1.0.1-ptf.2"
 
 title() {
 	echo "################################################################"
@@ -55,18 +55,37 @@ removeOldPackages() {
 getUpdatedRpms() {
 	printf $PFORMAT "Connecting to Update Server ... "
 	UPDATED_LIST=${FILEDIR}/list.html
-	if wget -q --output-document $UPDATED_LIST $SRCURL &>/dev/null; then
-		if (( $NO_PLUGINS )); then
-			UPDATED_RPMS=$(egrep "href.*supportutils-[[:digit:]].*rpm|href.*supportutils-plugin-updater.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+	if [ -x /usr/bin/wget ]; then
+		if wget -q --output-document $UPDATED_LIST $SRCURL &>/dev/null; then
+			if (( $NO_PLUGINS )); then
+				UPDATED_RPMS=$(egrep "href.*supportutils-[[:digit:]].*rpm|href.*supportutils-plugin-updater.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+			else
+				UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+			fi
+			echo Done
 		else
-			UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+			echo ERROR
+			echo "wget: Cannot connect to update server"
+			echo
+			exit 2
 		fi
-		echo Done
+	elif [ -x /usr/bin/curl ]; then
+		if curl -Lso $UPDATED_LIST $SRCURL &>/dev/null; then
+			if (( $NO_PLUGINS )); then
+				UPDATED_RPMS=$(egrep "href.*supportutils-[[:digit:]].*rpm|href.*supportutils-plugin-updater.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+			else
+				UPDATED_RPMS=$(grep "href.*supportutils.*rpm" $UPDATED_LIST | awk -F\" '{print $6}')
+			fi
+			echo Done
+		else
+			echo ERROR
+			echo "curl: Cannot connect to update server"
+			echo
+			exit 2
+		fi
 	else
-		echo ERROR
-		echo "Cannot connect to update server"
-		echo
-		exit 2
+		echo "ERROR: Missing wget and curl"
+		exit 3
 	fi
 }
 
@@ -127,7 +146,7 @@ pluginRequired() {
 	elif [ "$RPM" = "supportutils-plugin-ncs" ]; then
 		if rpm -q novell-cluster-services &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-sentinel" ]; then
-		if rpm -q novell-sentinel &>/dev/null; then return 0; else return 1; fi # needs updating when/if available
+		if rpm -q novell-Sentineljre &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-slepos" ]; then
 		if rpm -q slepos-release &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-susestudio" ]; then
@@ -144,12 +163,30 @@ downLoad() {
 	[ $DEBUG -gt 0 ] && echo " >>downLoad() Downloading $PACKAGE"
 	cd $FILEDIR
 	if [ $DEBUG -gt 0 ]; then
-		wget -Sv $RETRIES ${SRCURL}/$PACKAGE
-		RCODE=$?
-		echo
+		if [ -x /usr/bin/wget ]; then
+			/usr/bin/wget -Sv $RETRIES ${SRCURL}/$PACKAGE
+			RCODE=$?
+			echo
+		elif [ -x /usr/bin/curl ]; then
+			/usr/bin/curl -vL -o $PACKAGE ${SRCURL}/$PACKAGE
+			RCODE=$?
+			echo
+		else
+			echo "Download Failed: Missing wget and curl"
+			RCODE=255
+			echo
+		fi
 	else
-		wget -q $RETRIES ${SRCURL}/$PACKAGE &>/dev/null
-		RCODE=$?
+		if [ -x /usr/bin/wget ]; then
+			wget -q $RETRIES ${SRCURL}/$PACKAGE &>/dev/null
+			RCODE=$?
+		elif [ -x /usr/bin/curl ]; then
+			/usr/bin/curl -sL -o $PACKAGE ${SRCURL}/$PACKAGE
+			RCODE=$?
+		else
+			echo "Download Failed: Missing wget and curl"
+			RCODE=255
+		fi
 	fi
 	return $RCODE
 }

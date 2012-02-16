@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb 16 15:24:13 MST 2012 - jrecord@novell.com
+
+-removed wget dependency
+-supports curl if wget missing
+-added NetIQ Sentinel plugin
+
+-------------------------------------------------------------------
 Thu Jun 30 12:13:22 MDT 2011 - jrecord@novell.com
 
 -fixed network timeout
