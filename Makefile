@@ -47,6 +47,7 @@ clean:
 	rm -rf $(OBSPACKAGE)*
 	for i in $(SVNDIRS); do rm -f $$i/*~; done
 	rm -f *~
+	rm -f src/*tar.gz
 	@echo
 
 allclean: uninstall clean
