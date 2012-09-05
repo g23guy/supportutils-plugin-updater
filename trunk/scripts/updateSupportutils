@@ -5,10 +5,10 @@
 #              and all supporting supportutils plugins.
 # License:     GPLv2
 # Authors/Contributors:
-#              Jason Record (jrecord@novell.com)
-# Modified:    2012 Feb 16
+#              Jason Record (jrecord@suse.com)
+# Modified:    2012 Sep 05
 #############################################################
-SVER="1.0.3"
+SVER="1.0.4"
 
 title() {
 	echo "################################################################"
@@ -149,10 +149,12 @@ pluginRequired() {
 		if rpm -q novell-Sentineljre &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-slepos" ]; then
 		if rpm -q slepos-release &>/dev/null; then return 0; else return 1; fi
+	elif [ "$RPM" = "supportutils-plugin-susecloud" ]; then
+		if rpm -q suse-cloud-release &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-susestudio" ]; then
 		if rpm -q susestudio &>/dev/null; then return 0; else return 1; fi
 	else
-		return 0 # New plugins are automatically added since we currently don't know if they are required
+		return 1 # New plugins are automatically excluded since we currently don't know if they are required
 	fi
 }
 
