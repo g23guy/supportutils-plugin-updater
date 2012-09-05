@@ -1,5 +1,5 @@
 #
-# spec file for package supportutils-plugin-updater (Version 1.0-17)
+# spec file for package supportutils-plugin-updater (Version 1.0-18)
 #
 # Copyright (C) 2011 Novell, Inc.
 # This file and all modifications and additions to the pristine
@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      18
+Release:      18.PTF.120905
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -63,5 +63,32 @@ echo
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%changelog -n supportutils-plugin-updater
+%changelog
+* Wed Sep 05 2012 jrecord@suse.com
+- added suse cloud detection
+
+* Thu Feb 16 2012 jrecord@suse.com
+-removed wget dependency
+-supports curl if wget missing
+-added NetIQ Sentinel plugin
+
+* Thu Jun 30 2011 jrecord@suse.com
+-fixed network timeout
+
+* Fri Jan 28 2011 jrecord@suse.com
+-added message to run updateSupportutils after install
+
+* Thu Dec 21 2010 jrecord@suse.com
+-added plugin tags for idm,sentinel,ncs
+
+* Fri Dec 10 2010 jrecord@suse.com
+-added -p to exclude plugins
+-interface enhancements
+
+* Thu Dec 09 2010 jrecord@suse.com
+-fixed longer update RPM version needing updates
+-added -u to force RPM updates
+
+* Wed Dec 09 2010 jrecord@suse.com
+-initial build
 

@@ -14,9 +14,6 @@ install: dist
 	@echo ==================================================================
 	cp src/$(SRCFILE).gz $(BUILDDIR)/SOURCES
 	cp specs/$(OBSPACKAGE).spec $(BUILDDIR)/SPECS
-	cp specs/$(OBSPACKAGE).changes $(BUILDDIR)/SPECS
-	/usr/lib/build/changelog2spec $(BUILDDIR)/SPECS/$(OBSPACKAGE).changes >> $(BUILDDIR)/SPECS/$(OBSPACKAGE).spec
-	rm -f $(BUILDDIR)/SPECS/$(OBSPACKAGE).changes
 	@echo
 
 uninstall:
@@ -90,7 +87,6 @@ commit: build
 	osc ci -m "Removing old files before committing: $(OBSPACKAGE)-$(VERSION)-$(RELEASE)" Novell:NTS/$(OBSPACKAGE)
 	@rm -f Novell:NTS/$(OBSPACKAGE)/*
 	cp specs/$(OBSPACKAGE).spec Novell:NTS/$(OBSPACKAGE)
-	cp specs/$(OBSPACKAGE).changes Novell:NTS/$(OBSPACKAGE)
 	cp src/$(SRCFILE).gz Novell:NTS/$(OBSPACKAGE)
 	osc add Novell:NTS/$(OBSPACKAGE)/*
 	osc up Novell:NTS/$(OBSPACKAGE)
@@ -107,7 +103,6 @@ obsetup:
 	osc co Novell:NTS/$(OBSPACKAGE)
 	@rm -f Novell:NTS/$(OBSPACKAGE)/*
 	cp specs/$(OBSPACKAGE).spec Novell:NTS/$(OBSPACKAGE)
-	cp specs/$(OBSPACKAGE).changes Novell:NTS/$(OBSPACKAGE)
 	cp src/$(SRCFILE).gz Novell:NTS/$(OBSPACKAGE)
 	osc status Novell:NTS/$(OBSPACKAGE)
 
