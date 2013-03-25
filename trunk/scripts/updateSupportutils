@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@suse.com)
-# Modified:    2012 Sep 05
+# Modified:    2013 Mar 25
 #############################################################
-SVER="1.0.4"
+SVER="1.0.5"
 
 title() {
 	echo "################################################################"
@@ -306,7 +306,7 @@ cleanUp() {
 #############################################################
 # GLOBAL VARIABLES
 #############################################################
-SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_10/noarch/'
+SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_11_SP2/noarch/'
 BASENAME=$(basename $0)
 FILEDIR=$(mktemp -d /tmp/${BASENAME}-XXXXXXXXXXXXXXX)
 UPDATED_RPMS=''

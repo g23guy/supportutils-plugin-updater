@@ -1,7 +1,7 @@
 #
-# spec file for package supportutils-plugin-updater (Version 1.0-19)
+# spec file for package supportutils-plugin-updater (Version 1.0-20)
 #
-# Copyright (C) 2011 Novell, Inc.
+# Copyright (C) 2011-2013 Novell, Inc.
 # This file and all modifications and additions to the pristine
 # package are under the same license as the package itself.
 #
@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      19
+Release:      20
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -35,7 +35,7 @@ Please submit bug fixes or comments via:
 
 Authors:
 --------
-    Jason Record <jrecord@novell.com>
+    Jason Record <jrecord@suse.com>
 
 %prep
 %setup -q
@@ -64,6 +64,9 @@ echo
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon Mar 25 2013 jrecord@suse.com
+- changed to SLE11 SP2 repository
+
 * Wed Sep 05 2012 jrecord@suse.com
 - added suse cloud detection
 
