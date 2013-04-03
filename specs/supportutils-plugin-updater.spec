@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      20
+Release:      21
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -64,6 +64,9 @@ echo
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Wed Apr 3 2013 jrecord@suse.com
+- dynamically selects repository
+
 * Mon Mar 25 2013 jrecord@suse.com
 - changed to SLE11 SP2 repository
 

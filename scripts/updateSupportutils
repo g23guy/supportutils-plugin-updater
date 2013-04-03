@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@suse.com)
-# Modified:    2013 Mar 25
+# Modified:    2013 Apr 03
 #############################################################
-SVER="1.0.5"
+SVER="1.0.7"
 
 title() {
 	echo "################################################################"
@@ -306,7 +306,6 @@ cleanUp() {
 #############################################################
 # GLOBAL VARIABLES
 #############################################################
-SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_11_SP2/noarch/'
 BASENAME=$(basename $0)
 FILEDIR=$(mktemp -d /tmp/${BASENAME}-XXXXXXXXXXXXXXX)
 UPDATED_RPMS=''
@@ -343,8 +342,14 @@ do
 	esac
 done
 [ $DEBUG -gt 0 ] && PFORMAT="\n%-55s\n" || PFORMAT="%-55s"
+VER=$(grep -i "suse linux enterprise" /etc/SuSE-release | awk '{print $5}')
+case $VER in
+"11") SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_11_SP2/noarch/' ;;
+*) SRCURL='http://download.opensuse.org/repositories/Novell:/NTS/SLE_10/noarch/' ;;
+esac
 
 runAsRoot
+echo "Update Server: $SRCURL"; echo
 getUpdatedRpms
 removeOldPackages
 updateSupportutils
