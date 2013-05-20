@@ -6,9 +6,9 @@
 # License:     GPLv2
 # Authors/Contributors:
 #              Jason Record (jrecord@suse.com)
-# Modified:    2013 Apr 03
+# Modified:    2013 May 20
 #############################################################
-SVER="1.0.7"
+SVER="1.0.8"
 
 title() {
 	echo "################################################################"
@@ -135,6 +135,8 @@ pluginRequired() {
 		return 0 # always required
 	elif [ "$RPM" = "supportutils-plugin-updater" ]; then
 		return 0 # always required
+	elif [ "$RPM" = "supportutils-plugin-hae" ]; then
+		if rpm -q openais &>/dev/null; then return 0; else return 1; fi
 	elif [ "$RPM" = "supportutils-plugin-idm" ]; then
 		if rpm -q novell-idm &>/dev/null; then return 0; else return 1; fi # needs updating when/if available
 	elif [ "$RPM" = "supportutils-plugin-groupwise" ]; then
