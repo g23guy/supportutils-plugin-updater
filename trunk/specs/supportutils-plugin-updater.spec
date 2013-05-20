@@ -1,5 +1,5 @@
 #
-# spec file for package supportutils-plugin-updater (Version 1.0-20)
+# spec file for package supportutils-plugin-updater (Version 1.0-22)
 #
 # Copyright (C) 2011-2013 Novell, Inc.
 # This file and all modifications and additions to the pristine
@@ -15,7 +15,7 @@ License:      GPLv2
 Group:        Documentation/SuSE
 Autoreqprov:  on
 Version:      1.0
-Release:      21
+Release:      22
 Source:       %{name}-%{version}.tar.gz
 Summary:      Supportutils Auto Update Client
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -64,6 +64,9 @@ echo
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon May 20 2013 jrecord@suse.com
+- added hae plugin detection
+
 * Wed Apr 3 2013 jrecord@suse.com
 - dynamically selects repository
 
